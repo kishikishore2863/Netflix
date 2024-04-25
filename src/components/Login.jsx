@@ -1,26 +1,83 @@
 import React, { useRef, useState } from "react";
+import { auth } from "../utils/firebase";
 import Header from "./Header";
 import { checkvalidateData } from "../utils/validate";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const Login = () => {
   const [isSignInFrom, setIsSignInFrom] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+
   const name = useRef(null);
   const email = useRef(null);
-  const Password = useRef(null);
+  const password = useRef(null);
+
   const handleButtonClick = () => {
     console.log(email.current.value);
-    console.log(Password.current.value);
+    console.log(password.current.value);
     const message = checkvalidateData(
       email.current.value,
-      Password.current.value
+      password.current.value
     );
-    console.log(message);
+
     setErrorMessage(message);
+
+    if (message) return;
+
+    if (!isSignInFrom) {
+      // createUserWithEmailAndPassword(
+      //   auth,
+      //   email.current.value,
+      //   password.current.value
+      // )
+      //   .then((userCredential) => {
+      //     // Signed up
+      //     const user = userCredential.user;
+      //     console.log(user);
+      //     // ...
+      //   })
+      //   .catch((error) => {
+      //     const errorCode = error.code;
+      //     const errorMessage = error.message;
+      //     setErrorMessage(errorCode + "-" + errorMessage);
+      //     // ..
+      //   });
+      const actionCodeSettings = {
+        // URL you want to redirect back to. The domain (www.example.com) for this
+        // URL must be in the authorized domains list in the Firebase Console.
+        url: "https://www.example.com/finishSignUp?cartId=1234",
+        // This must be true.
+        handleCodeInApp: true,
+        iOS: {
+          bundleId: "com.example.ios",
+        },
+        android: {
+          packageName: "com.example.android",
+          installApp: true,
+          minimumVersion: "12",
+        },
+        dynamicLinkDomain: "example.page.link",
+      };
+      sendSignInLinkToEmail(auth, email.current.value, actionCodeSettings)
+        .then(() => {
+          // The link was successfully sent. Inform the user.
+          // Save the email locally so you don't need to ask the user for it again
+          // if they open the link on the same device.
+          window.localStorage.setItem("emailForSignIn", email);
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // ...
+        });
+    }
   };
+
   const toggleSignInFrom = () => {
     setIsSignInFrom(!isSignInFrom);
   };
+
   return (
     <>
       <div>
@@ -55,7 +112,7 @@ const Login = () => {
             />
           )}
           <input
-            ref={Password}
+            ref={password}
             type="text"
             placeholder="Password"
             className="p-2 my-2 w-full rounded-sm bg-slate-700"
