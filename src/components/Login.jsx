@@ -3,6 +3,7 @@ import { auth } from "../utils/firebase";
 import Header from "./Header";
 import { checkvalidateData } from "../utils/validate";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const Login = () => {
   const [isSignInFrom, setIsSignInFrom] = useState(true);
@@ -25,51 +26,42 @@ const Login = () => {
     if (message) return;
 
     if (!isSignInFrom) {
-      // createUserWithEmailAndPassword(
-      //   auth,
-      //   email.current.value,
-      //   password.current.value
-      // )
-      //   .then((userCredential) => {
-      //     // Signed up
-      //     const user = userCredential.user;
-      //     console.log(user);
-      //     // ...
-      //   })
-      //   .catch((error) => {
-      //     const errorCode = error.code;
-      //     const errorMessage = error.message;
-      //     setErrorMessage(errorCode + "-" + errorMessage);
-      //     // ..
-      //   });
-      const actionCodeSettings = {
-        // URL you want to redirect back to. The domain (www.example.com) for this
-        // URL must be in the authorized domains list in the Firebase Console.
-        url: "https://www.example.com/finishSignUp?cartId=1234",
-        // This must be true.
-        handleCodeInApp: true,
-        iOS: {
-          bundleId: "com.example.ios",
-        },
-        android: {
-          packageName: "com.example.android",
-          installApp: true,
-          minimumVersion: "12",
-        },
-        dynamicLinkDomain: "example.page.link",
-      };
-      sendSignInLinkToEmail(auth, email.current.value, actionCodeSettings)
-        .then(() => {
-          // The link was successfully sent. Inform the user.
-          // Save the email locally so you don't need to ask the user for it again
-          // if they open the link on the same device.
-          window.localStorage.setItem("emailForSignIn", email);
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          console.log(user);
+
           // ...
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+          // ..
+        });
+    }
+    if (isSignInFrom) {
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+
           // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "" + errorMessage);
         });
     }
   };
@@ -113,7 +105,7 @@ const Login = () => {
           )}
           <input
             ref={password}
-            type="text"
+            type="password"
             placeholder="Password"
             className="p-2 my-2 w-full rounded-sm bg-slate-700"
           />
@@ -139,3 +131,134 @@ const Login = () => {
 };
 
 export default Login;
+// import React, { useRef, useState } from "react";
+// import { auth } from "../utils/firebase";
+// import Header from "./Header";
+// import { checkvalidateData } from "../utils/validate";
+// import { createUserWithEmailAndPassword } from "firebase/auth";
+// import { sendSignInLinkToEmail } from "firebase/auth";
+
+// const Login = () => {
+//   const [isSignInFrom, setIsSignInFrom] = useState(true);
+//   const [errorMessage, setErrorMessage] = useState(null);
+
+//   const name = useRef(null);
+//   const email = useRef(null);
+//   const password = useRef(null);
+
+//   const handleButtonClick = () => {
+//     console.log(email.current.value);
+//     console.log(password.current.value);
+//     const message = checkvalidateData(
+//       email.current.value,
+//       password.current.value
+//     );
+
+//     setErrorMessage(message);
+
+//     if (message) return;
+
+//     if (!isSignInFrom) {
+//       createUserWithEmailAndPassword(
+//         auth,
+//         email.current.value,
+//         password.current.value
+//       )
+//         .then((userCredential) => {
+//           // Signed up
+//           const user = userCredential.user;
+//           console.log(user);
+//           // ...
+//         })
+//         .catch((error) => {
+//           const errorCode = error.code;
+//           const errorMessage = error.message;
+//           setErrorMessage(errorCode + "-" + errorMessage);
+//           // ...
+//         }); // <--- Add a closing parenthesis here
+//     }
+//   };
+//   if (isSignInFrom) {
+//     signInWithEmailAndPassword(
+//       auth,
+//       email.current.value,
+//       password.current.value
+//     )
+//       .then((userCredential) => {
+//         // Signed in
+//         const user = userCredential.user;
+//         console.log(user);
+//         // ...
+//       })
+//       .catch((error) => {
+//         const errorCode = error.code;
+//         const errorMessage = error.message;
+//         setErrorMessage(errorCode + "_" + errorMessage);
+//       });
+//   }
+
+//   const toggleSignInFrom = () => {
+//     setIsSignInFrom(!isSignInFrom);
+//   };
+
+//   return (
+//     <>
+//       <div>
+//         <Header />
+//         <div className="absolute">
+//           <img
+//             src="https://assets.nflxext.com/ffe/siteui/vlv3/9f46b569-aff7-4975-9b8e-3212e4637f16/453ba2a1-6138-4e3c-9a06-b66f9a2832e4/IN-en-20240415-popsignuptwoweeks-perspective_alpha_website_medium.jpg"
+//             alt="logo"
+//           />
+//         </div>
+//         <form
+//           onSubmit={(e) => {
+//             e.preventDefault();
+//           }}
+//           className="w-3/12 p-12 mx-auto mt-36 right-0 left-0 text-white absolute bg-black bg-opacity-80 "
+//         >
+//           <h1 className="text-3xl mb-5 font-bold">
+//             {isSignInFrom ? "Sign In" : "Sign Up"}
+//           </h1>
+//           <input
+//             ref={email}
+//             type="text"
+//             placeholder="Email Address"
+//             className="p-2 my-2 w-full rounded-sm bg-slate-700"
+//           />
+//           {!isSignInFrom && (
+//             <input
+//               ref={name}
+//               type="text"
+//               placeholder="Full Name"
+//               className="p-2 my-2 w-full rounded-sm bg-slate-700"
+//             />
+//           )}
+//           <input
+//             ref={password}
+//             type="password"
+//             placeholder="Password"
+//             className="p-2 my-2 w-full rounded-sm bg-slate-700"
+//           />
+//           <p className="text-red-600 text-sm">{errorMessage}</p>
+//           <button
+//             onClick={handleButtonClick}
+//             className="bg-red-700 p-2 my-5 w-full rounded-lg"
+//           >
+//             {isSignInFrom ? "Sign In" : "Sign Up"}
+//           </button>
+//           <p
+//             onClick={toggleSignInFrom}
+//             className="cursor-pointer hover:underline"
+//           >
+//             {isSignInFrom
+//               ? "New to Netflix? Sign Up now"
+//               : "Already registered? Sign In now "}
+//           </p>
+//         </form>
+//       </div>
+//     </>
+//   );
+// };
+
+// export default Login;
