@@ -1,6 +1,7 @@
 import Head from "./Head";
 import useNowplaying from "../hooks/useNowplaying";
 import MainContainer from "./MainContainer";
+import SecondaryContainer from "./SecondaryContainer";
 
 const Browser = () => {
   useNowplaying();
@@ -8,6 +9,7 @@ const Browser = () => {
     <div>
       <Head />
       <MainContainer />
+      {/* <SecondaryContainer></SecondaryContainer> */}
     </div>
   );
 };

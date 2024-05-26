@@ -25,11 +25,10 @@ const Header = () => {
   }, []);
 
   return (
-    <div className="absolute bg-transparent w-full py-2 px-20  bg-gradient-to-b from-black z-10 h-16">
+    <div className="absolute  w-full py-2 px-20 bg-black   z-10 h-16">
       <img className="w-40" src={LOGO} alt="logo" />
     </div>
   );
 };
 
 export default Header;
-// bg-gradient-to-b from-black
